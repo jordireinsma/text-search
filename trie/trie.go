@@ -85,16 +85,16 @@ func (t *Trie) search(w, word string, distance int, c rune, rows [2][]int, res m
 }
 
 func (t *Trie) List() []string {
-	return t.list("")
+	words := []string{}
+	t.list(&words, "")
+	return words
 }
 
-func (t *Trie) list(word string) []string {
-	words := []string{}
+func (t *Trie) list(words *[]string, word string) {
 	if t.word {
-		words = append(words, word)
+		*words = append(*words, word)
 	}
 	for c, ptr := range t.next {
-		words = append(words, ptr.list(word+string(c))...)
+		ptr.list(words, word+string(c))
 	}
-	return words
 }
