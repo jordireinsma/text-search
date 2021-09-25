@@ -41,45 +41,60 @@ func (t *Trie) Find(word string) bool {
 	return ptr.word
 }
 
+type edits struct {
+	target   []rune
+	distance int
+}
+
 func (t *Trie) Search(word string, distance int) map[int][]string {
 	rowlen := len([]rune(word)) + 1
-	rows := [2][]int{
-		make([]int, rowlen),
-		make([]int, rowlen),
+	rows := [3][]int{
+		make([]int, rowlen), // previous row
+		make([]int, rowlen), // current row
+		make([]int, rowlen), // next row
 	}
-	for i := 0; i < len(rows[0]); i++ {
-		rows[0][i] = i
+	for i := 0; i < rowlen; i++ {
+		rows[0][i] = rowlen
+		rows[1][i] = i
+	}
+	dp := edits{
+		target:   []rune(word),
+		distance: distance,
 	}
 	res := make(map[int][]string)
 
-	for c, ptr := range t.next {
-		ptr.search(string(c), word, distance, c, rows, res)
+	for c, next := range t.next {
+		dp.run(next, []rune{c}, rows, res)
 	}
 	return res
 }
 
-func (t *Trie) search(w, word string, distance int, c rune, rows [2][]int, res map[int][]string) {
-	rows[1][0] = rows[0][0] + 1
+func (dp *edits) run(ptr *Trie, word []rune, rows [3][]int, res map[int][]string) {
+	rows[2][0] = rows[1][0] + 1
 
 	i := 0
-	for _, cc := range word {
-		insert := rows[1][i] + 1
-		delete := rows[0][i+1] + 1
-		replace := rows[0][i]
-		if c != cc {
+	for ; i < len(dp.target); i++ {
+		insert := rows[2][i] + 1
+		delete := rows[1][i+1] + 1
+		replace := rows[1][i]
+		transpose := insert
+		if word[len(word)-1] != dp.target[i] {
 			replace++
+			if i > 1 && len(word) > 1 && word[len(word)-2] == dp.target[i] && word[len(word)-1] == dp.target[i-1] {
+				transpose = rows[0][i-1] + 1
+			}
 		}
-		rows[1][i+1] = min(insert, delete, replace)
-		i++
+		rows[2][i+1] = min(insert, delete, replace, transpose)
 	}
-	cost := rows[1][i]
-	if cost <= distance && t.word {
-		res[cost] = append(res[cost], w)
+	cost := rows[2][i]
+	if cost <= dp.distance && ptr.word {
+		res[cost] = append(res[cost], string(word))
 	}
-	if min(rows[1]...) <= distance {
+	if min(rows[2]...) <= dp.distance {
 		copy(rows[0], rows[1])
-		for c, ptr := range t.next {
-			ptr.search(w+string(c), word, distance, c, rows, res)
+		copy(rows[1], rows[2])
+		for c, next := range ptr.next {
+			dp.run(next, append(word, c), rows, res)
 		}
 	}
 }
@@ -94,7 +109,7 @@ func (t *Trie) list(words *[]string, word string) {
 	if t.word {
 		*words = append(*words, word)
 	}
-	for c, ptr := range t.next {
-		ptr.list(words, word+string(c))
+	for c, next := range t.next {
+		next.list(words, word+string(c))
 	}
 }
