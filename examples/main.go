@@ -2,26 +2,34 @@ package main
 
 import (
 	"fmt"
-	"trie"
+
+	"github.com/jordi-reinsma/text-search/trie"
 )
 
 func main() {
+	words := []string{
+		"bob", "alice", "bobina", "bo",
+	}
+
 	root := trie.New()
-	fmt.Println("bob", trie.Find(root, "bob"))
+	fmt.Println("bob", root.Find("bob"))
 
-	trie.Insert(root, "bob", "alice", "bobina", "yes")
-	fmt.Println("bob", trie.Find(root, "bob"))
-	fmt.Println("bobi", trie.Find(root, "bobi"))
-	fmt.Println("bobina", trie.Find(root, "bobina"))
-	fmt.Println("bobinas", trie.Find(root, "bobinas"))
+	for _, word := range words {
+		root.Insert(word)
+	}
 
-	fmt.Println("alice", trie.Find(root, "alice"))
-	trie.Insert(root, "bobi")
+	for _, word := range words {
+		fmt.Println(word, root.Find(word))
+	}
 
-	fmt.Println("bobi", trie.Find(root, "bobi"))
+	fmt.Println("all", root.Find(""))
+	fmt.Println(root.List())
 
-	fmt.Println(root)
+	fmt.Println(root.Search("bob", 1))
+	fmt.Println(root.Search("boba", 1))
+	fmt.Println(root.Search("bobi", 2))
 
-	trie.Insert(root, "")
-	fmt.Println(root)
+	root.Insert("")
+	fmt.Println("all", root.Find(""))
+	fmt.Println(root.List())
 }
