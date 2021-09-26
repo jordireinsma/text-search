@@ -57,44 +57,42 @@ func (t *Trie) Search(word string, distance int) map[int][]string {
 		rows[0][i] = rowlen
 		rows[1][i] = i
 	}
-	dp := edits{
+	e := edits{
 		target:   []rune(word),
 		distance: distance,
 	}
 	res := make(map[int][]string)
-
 	for c, next := range t.next {
-		dp.run(next, []rune{c}, rows, res)
+		e.run(next, []rune{c}, rows, res)
 	}
 	return res
 }
 
-func (dp *edits) run(ptr *Trie, word []rune, rows [3][]int, res map[int][]string) {
+func (e *edits) run(ptr *Trie, word []rune, rows [3][]int, res map[int][]string) {
 	rows[2][0] = rows[1][0] + 1
-
 	i := 0
-	for ; i < len(dp.target); i++ {
+	for ; i < len(e.target); i++ {
 		insert := rows[2][i] + 1
 		delete := rows[1][i+1] + 1
 		replace := rows[1][i]
 		transpose := insert
-		if word[len(word)-1] != dp.target[i] {
+		if word[len(word)-1] != e.target[i] {
 			replace++
-			if i > 1 && len(word) > 1 && word[len(word)-2] == dp.target[i] && word[len(word)-1] == dp.target[i-1] {
+			if i > 1 && len(word) > 1 && word[len(word)-2] == e.target[i] && word[len(word)-1] == e.target[i-1] {
 				transpose = rows[0][i-1] + 1
 			}
 		}
 		rows[2][i+1] = min(insert, delete, replace, transpose)
 	}
 	cost := rows[2][i]
-	if cost <= dp.distance && ptr.word {
+	if cost <= e.distance && ptr.word {
 		res[cost] = append(res[cost], string(word))
 	}
-	if min(rows[2]...) <= dp.distance {
+	if min(rows[2]...) <= e.distance {
 		copy(rows[0], rows[1])
 		copy(rows[1], rows[2])
 		for c, next := range ptr.next {
-			dp.run(next, append(word, c), rows, res)
+			e.run(next, append(word, c), rows, res)
 		}
 	}
 }
