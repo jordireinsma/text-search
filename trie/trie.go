@@ -11,8 +11,8 @@ func min(xs ...int) int {
 }
 
 type Trie struct {
-	next map[rune]*Trie
-	word bool
+	next  map[rune]*Trie
+	final bool
 }
 
 func New() *Trie {
@@ -27,7 +27,7 @@ func (t *Trie) Insert(word string) {
 		}
 		ptr = ptr.next[c]
 	}
-	ptr.word = true
+	ptr.final = true
 }
 
 func (t *Trie) Find(word string) bool {
@@ -38,7 +38,7 @@ func (t *Trie) Find(word string) bool {
 			return false
 		}
 	}
-	return ptr.word
+	return ptr.final
 }
 
 type edits struct {
@@ -85,7 +85,7 @@ func (e *edits) run(ptr *Trie, word []rune, rows [3][]int, res map[int][]string)
 		rows[2][i+1] = min(insert, delete, replace, transpose)
 	}
 	cost := rows[2][i]
-	if cost <= e.distance && ptr.word {
+	if cost <= e.distance && ptr.final {
 		res[cost] = append(res[cost], string(word))
 	}
 	if min(rows[2]...) <= e.distance {
@@ -104,7 +104,7 @@ func (t *Trie) List() []string {
 }
 
 func (t *Trie) list(words *[]string, word string) {
-	if t.word {
+	if t.final {
 		*words = append(*words, word)
 	}
 	for c, next := range t.next {

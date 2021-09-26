@@ -2,8 +2,8 @@ package tst
 
 type TST struct {
 	l, m, r *TST
-	word    bool
 	key     rune
+	final   bool
 }
 
 func New() *TST {
@@ -34,7 +34,7 @@ func (t *TST) Insert(word string) {
 			}
 		}
 	}
-	ptr.word = true
+	ptr.final = true
 }
 
 func (t *TST) Find(word string) bool {
@@ -54,7 +54,7 @@ func (t *TST) Find(word string) bool {
 			}
 		}
 	}
-	return ptr.word
+	return ptr.final
 }
 
 func (t *TST) Search(word string, distance int) map[int][]string {
@@ -67,7 +67,7 @@ func (t *TST) List() []string {
 
 func (t *TST) list(word string) []string {
 	words := []string{}
-	if t.word {
+	if t.final {
 		words = append(words, word)
 	}
 	if t.l != nil {

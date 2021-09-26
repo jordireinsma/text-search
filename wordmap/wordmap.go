@@ -51,7 +51,7 @@ func (m *Wordmap) Search(word string, distance int) map[int][]string {
 }
 
 func edits(alphabet []string, words map[string]bool) map[string]bool {
-	variants := make([]string, len(words)*len(alphabet))
+	variants := make([]string, 2*len(words)*len(alphabet))
 	for word := range words {
 		for i := 0; i < len(word); i++ {
 			for _, c := range alphabet {
