@@ -17,6 +17,7 @@ const (
 )
 
 const inserts = 100000
+const wordlen = 8
 
 func randString(n int) string {
 	b := make([]byte, n)
@@ -35,9 +36,9 @@ func randString(n int) string {
 }
 
 func insert(d Dictionary, b *testing.B) {
-	words := []string{}
+	words := make([]string, inserts)
 	for i := 0; i < inserts; i++ {
-		words = append(words, randString(i%12))
+		words[i] = randString(i % wordlen)
 	}
 	b.ResetTimer()
 	for j := 0; j < b.N; j++ {
@@ -57,9 +58,9 @@ func BenchmarkInsertWordMap(b *testing.B) {
 }
 
 func find(d Dictionary, b *testing.B) {
-	words := []string{}
+	words := make([]string, inserts)
 	for i := 0; i < inserts; i++ {
-		words = append(words, randString(i%12))
+		words[i] = randString(i % wordlen)
 	}
 	obj := d
 	for _, word := range words {
@@ -80,9 +81,9 @@ func BenchmarkFindWordMap(b *testing.B) {
 }
 
 func search(d Dictionary, b *testing.B) {
-	words := []string{}
+	words := make([]string, inserts)
 	for i := 0; i < inserts; i++ {
-		words = append(words, randString(i%12))
+		words[i] = randString(i % wordlen)
 	}
 	obj := d
 	for _, word := range words {
@@ -90,22 +91,22 @@ func search(d Dictionary, b *testing.B) {
 	}
 	b.ResetTimer()
 	for j := 0; j < b.N; j++ {
-		obj.Search(words[rand.Int63n(inserts)], 2)
+		obj.Fuzzy(words[rand.Int63n(inserts)], 2)
 	}
 }
 
-func BenchmarkSearchTrie(b *testing.B) {
+func BenchmarkFuzzyTrie(b *testing.B) {
 	search(trie.New(), b)
 }
 
-func BenchmarkSearchWordMap(b *testing.B) {
+func BenchmarkFuzzyWordMap(b *testing.B) {
 	search(wordmap.New(), b)
 }
 
 func list(d Dictionary, b *testing.B) {
-	words := []string{}
+	words := make([]string, inserts)
 	for i := 0; i < inserts; i++ {
-		words = append(words, randString(i%12))
+		words[i] = randString(i % wordlen)
 	}
 	obj := d
 	for _, word := range words {

@@ -57,7 +57,7 @@ func (t *TST) Find(word string) bool {
 	return ptr.final
 }
 
-func (t *TST) Search(word string, distance int) map[int][]string {
+func (t *TST) Fuzzy(word string, distance int) map[int][]string {
 	return make(map[int][]string)
 }
 

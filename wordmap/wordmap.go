@@ -24,13 +24,15 @@ func (m *Wordmap) Find(word string) bool {
 	return found
 }
 
-func (m *Wordmap) Search(word string, distance int) map[int][]string {
+func (m *Wordmap) Fuzzy(word string, distance int) map[int][]string {
 	res := make(map[int][]string)
+	words := make(map[string]bool)
 	if _, found := m.words[word]; found && distance >= 0 {
 		res[0] = []string{word}
+		words[word] = true
+	} else {
+		words[word] = false
 	}
-	words := make(map[string]bool)
-	words[word] = false
 	alphabet := make([]string, 0, len(m.alphabet))
 	for c := range m.alphabet {
 		alphabet = append(alphabet, string(c))
@@ -76,9 +78,6 @@ func edits(alphabet []string, words map[string]bool) map[string]bool {
 	res := make(map[string]bool, 2*len(words))
 	for _, variant := range variants {
 		res[variant] = words[variant]
-	}
-	for word := range words {
-		res[word] = words[word]
 	}
 	return res
 }

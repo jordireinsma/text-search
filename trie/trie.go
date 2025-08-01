@@ -1,15 +1,5 @@
 package trie
 
-func min(xs ...int) int {
-	res := xs[0]
-	for _, x := range xs {
-		if x < res {
-			res = x
-		}
-	}
-	return res
-}
-
 type Trie struct {
 	next  map[rune]*Trie
 	final bool
@@ -46,7 +36,7 @@ type edits struct {
 	distance int
 }
 
-func (t *Trie) Search(word string, distance int) map[int][]string {
+func (t *Trie) Fuzzy(word string, distance int) map[int][]string {
 	rowlen := len([]rune(word)) + 1
 	rows := [3][]int{
 		make([]int, rowlen), // previous row
@@ -71,7 +61,7 @@ func (t *Trie) Search(word string, distance int) map[int][]string {
 func (e *edits) run(ptr *Trie, word []rune, rows [3][]int, res map[int][]string) {
 	rows[2][0] = rows[1][0] + 1
 	i := 0
-	for ; i < len(e.target); i++ {
+	for ; i <= len(e.target); i++ {
 		insert := rows[2][i] + 1
 		delete := rows[1][i+1] + 1
 		replace := rows[1][i]
@@ -110,4 +100,14 @@ func (t *Trie) list(words *[]string, word string) {
 	for c, next := range t.next {
 		next.list(words, word+string(c))
 	}
+}
+
+func min(xs ...int) int {
+	res := xs[0]
+	for _, x := range xs {
+		if x < res {
+			res = x
+		}
+	}
+	return res
 }
